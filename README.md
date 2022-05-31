@@ -81,4 +81,44 @@
         npm install react-native-image-picker
        ```
 
-       
+## Chapter 2
+### Redux APIs
+The Redux API surface is tiny. Redux defines a set of contracts for you to implement (such as reducers) and provides a few helper functions to tie these contracts together.
+This section documents the complete Redux API. Keep in mind that Redux is only concerned with managing the state. In a real app, you'll also want to use UI bindings like react-redux.
+
+### Importing
+```
+import firebase from 'firebase/compat/app';
+```
+
+```
+import {USER_STATE_CHANGE, USER_POSTS_STATE_CHANGE, USER_PHOTO_STATE_CHANGE, STORE_USER, USER_FOLLOWING_STATE_CHANGE, USERS_STATE_CHANGE, USER_CHATS_STATE_CHANGE, USERS_DATA_STATE_CHANGE,USERS_POSTS_STATE_CHANGE,All_POSTS_STATE_CHANGE} from '../constants/index'
+```
+
+```
+import 'firebase/compat/firestore';
+```
+
+```
+import 'firebase/compat/storage';
+```
+
+### Functions
+- fetchUser
+```
+    export function fetchUser() {
+    return ((dispatch) => {
+       firebase.firestore()
+            .collection("users")
+            .doc(firebase.auth().currentUser?firebase.auth().currentUser.uid:firebase.auth().currentUser.uid)
+            .onSnapshot((snapshot, error) => {
+                if (snapshot.exists) {
+                    dispatch({ type: USER_STATE_CHANGE, currentUser: { uid: firebase.auth().currentUser.uid, ...snapshot.data() } })
+                }
+            })
+     
+    })
+    }
+```
+
+This function takes a user id as an argument and checks the users table in the database if the id exists it gives an order for taking a snapshot of user's data and store it in the variable USER_STATE_CHANGE and if the id doesn't exist there'll be an error.
