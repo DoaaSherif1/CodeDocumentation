@@ -169,4 +169,104 @@ export function fetchUsers(){
 }
 ```
 
-This function sends to the backend server a GET Request to check the users table and collect 
+This function sends to the backend server a GET Request to check the users table and collect all the users' IDs and then gives an order for taking a snapshot of users' data in order to map (organise) them as every id is next to its user data and store them in the variable USERS_STATE_CHANGE.
+
+
+- fetchUsersData
+```
+export function fetchUsersData(uid){
+    return ((dispatch,getState) =>{
+        const found = ( getState().usersState && getState().usersState.users ) ? getState().usersState.users.some(el => el.uid === uid): [];
+        console.log(found )
+       if(!found){
+        firebase.firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser.uid)
+        .get()
+        .then((snapshot) => {
+            if (snapshot.exists) {
+                let user= snapshot.data();
+                user.uid=snapshot.id;
+                dispatch({ type: USERS_DATA_STATE_CHANGE,user });
+                dispatch(fetchUsersFollowingPosts(uid))
+            }
+            else{
+                console.log('does not exist')
+            }
+        })
+
+       }
+    })
+}
+```
+
+This function takes a user id as an argument and sends it to the backend server through a GET Request ,it waits for a response then when the response is recieved it checks whether an error has occured or not, if there is an error it logs 'does not exist' onto the console if there is no error the function changes the values of 'user' object with the values recieved from the api .
+
+Parameters:
+uid (string): an id of an existing user in the database
+required: yes
+
+- fetchUserChats
+```
+export function fetchUserChats() {
+    return ((dispatch) => {
+        let listener = firebase.firestore()
+            .collection("chats")
+            .where("users", "array-contains", firebase.auth().currentUser.uid)
+            .orderBy("lastMessageTimestamp", "desc")
+            .onSnapshot((snapshot) => {
+                let chats = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    return { id, ...data }
+                })
+
+                for (let i = 0; i < chats.length; i++) {
+                    let otherUserId;
+                    if (chats[i].users[0] == firebase.auth().currentUser.uid) {
+                        otherUserId = chats[i].users[1];
+                    } else {
+                        otherUserId = chats[i].users[0];
+                    }
+                    dispatch(fetchUsersData(otherUserId, false))
+                }
+
+                dispatch({ type: USER_CHATS_STATE_CHANGE, chats })
+            })
+        unsubscribe.push(listener)
+    })
+}
+
+```
+
+This function works when the user write any message it takes it and store it in the user chats table by its id and gets the users' messages in descending order attached to their timestamp and takes a snapshot of the data and store it in the variable USER_CHATS_STATE_CHANGE .
+
+
+- fetchUserPosts
+```
+export function fetchUserPosts(){
+
+    return ((dispatch)=>{
+        firebase.firestore()
+        .collection("posts")
+        .doc(firebase.auth().currentUser.uid)
+        .collection("event")
+        .orderBy("creation","asc")
+        .get()
+        .then ((snapshot)=>{
+            let posts =snapshot.docs.map(doc =>{
+                const data = doc.data();
+                const id=doc.id;
+                return {id,...data}
+            })
+            dispatch({type:USER_POSTS_STATE_CHANGE,posts})
+            
+        })
+    })
+}
+```
+
+
+This function takes the current user id as an argument and sends it to the backend server through a GET Request to check the posts table then the events table and sends back the user's events as a response in ascending order for creation time and takes a snapshot of the data and stores it in the variable USER_POSTS_STATE_CHANGE .
+
+
