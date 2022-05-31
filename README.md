@@ -122,3 +122,51 @@ import 'firebase/compat/storage';
 ```
 
 This function takes a user id as an argument and checks the users table in the database if the id exists it gives an order for taking a snapshot of user's data and store it in the variable USER_STATE_CHANGE and if the id doesn't exist there'll be an error.
+
+
+- fetchUserPhoto
+```
+export function fetchUserPhoto() {
+    return ((dispatch) => {
+       firebase.firestore()
+            .collection("users")
+            
+            .doc(firebase.auth().currentUser?firebase.auth().currentUser.uid:firebase.auth().currentUser.uid)
+            .collection('profilePhoto')
+         
+            .onSnapshot((snapshot, error) => {
+                if (snapshot.exists) {
+                    dispatch({ type: USER_PHOTO_STATE_CHANGE, photo: { uid: firebase.auth().currentUser.uid, ...snapshot.data() } })
+                }
+            
+            })
+     
+    })
+}
+```
+
+This function takes a user id as an argument and checks the users table in the database if the id exists then checks profilePhoto table and gives an order for taking a snapshot of user's profile photo URL and store it in the variable USER_PHOTO_STATE_CHANGEand store every photo next to its user id and the snapshot of data and if the id doesn't exist there'll be an error.
+
+
+- fetchUsers
+```
+export function fetchUsers(){
+
+    return ((dispatch)=>{
+        firebase.firestore()
+        .collection("users")
+        .get()
+        .then ((snapshot)=>{
+            let users =snapshot.docs.map(doc =>{
+                const data = doc.data();
+                const id=doc.id;
+                return {id,...data}
+            })
+            dispatch({type:USERS_STATE_CHANGE,users})
+            
+        })
+    })
+}
+```
+
+This function sends to the backend server a GET Request to check the users table and collect 
