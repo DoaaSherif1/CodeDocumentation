@@ -204,6 +204,7 @@ This function takes a user id as an argument and sends it to the backend server 
 
 Parameters:
 uid (string): an id of an existing user in the database
+
 required: yes
 
 - fetchUserChats
@@ -270,3 +271,34 @@ export function fetchUserPosts(){
 This function takes the current user id as an argument and sends it to the backend server through a GET Request to check the posts table then the events table and sends back the user's events as a response in ascending order for creation time and takes a snapshot of the data and stores it in the variable USER_POSTS_STATE_CHANGE .
 
 
+- fetchAllPosts
+```
+export function fetchAllPosts(){
+
+    return ((dispatch)=>{
+        firebase.firestore()
+        .collection("posts")
+        
+        .doc("id")
+        .collection("event")
+        // .orderBy("creation","asc")
+        .get()
+        .then ((snapshot)=>{
+            let Allposts =snapshot.docs.map(doc =>{
+                const data = doc.data();
+                const id=doc.id;
+                return {id,...data}
+            })
+
+            console.log(Allposts)
+            dispatch({type:All_POSTS_STATE_CHANGE,Allposts})
+            
+        })
+    })
+}
+```
+
+This function sends to the backend server a GET Request to check the posts table and the events table and collect all posts' IDs then gives an order for taking a snapshot of posts' data in order to map (organise) them as every id is next to its post data and store them in the variable All_POSTS_STATE_CHANGE.
+
+
+- 
