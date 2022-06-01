@@ -301,4 +301,124 @@ export function fetchAllPosts(){
 This function sends to the backend server a GET Request to check the posts table and the events table and collect all posts' IDs then gives an order for taking a snapshot of posts' data in order to map (organise) them as every id is next to its post data and store them in the variable All_POSTS_STATE_CHANGE.
 
 
-- 
+- fetchUserFollowing
+```
+export function fetchUserFolowing(){
+
+    return ((dispatch)=>{
+        let listener = firebase.firestore()
+        .collection("following")
+        .doc(firebase.auth().currentUser.uid)
+        .collection("userFollowing")
+        .onSnapshot ((snapshot)=>{
+            let following =snapshot.docs.map(doc =>{
+                // const data = doc.data();
+                const id=doc.id;
+                return {id}
+            })
+
+            // console.log(posts)
+            dispatch({type:USER_FOLLOWING_STATE_CHANGE,following});
+            // for(let i=0; i<following.length; i++){
+                for (let i = 0; i < following.length; i++) {
+                    dispatch(fetchUsersData(following[i], true));
+                }
+            
+        })
+        unsubscribe.push(listener)
+    })
+}
+```
+
+This function used when the user wants to know his following list it checks the following table and userFollowing table and gives an order for making the list by their id and taking a snapshot of the data and sotring it in the variable USER_FOLLOWING_STSTE_CHANGE ,the id is used as a foreign primary key .
+
+
+- queryUsersByUsername
+```
+export function queryUsersByUsername(username) {
+    return ((dispatch, getState) => {
+        return new Promise((resolve, reject) => {
+            if (username.length == 0) {
+                resolve([])
+            }
+            firebase.firestore()
+                .collection('users')
+                .where('username', '>=', username)
+                .limit(10)
+                .get()
+                .then((snapshot) => {
+                    let users = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        const id = doc.id;
+                        return { id, ...data }
+                    });
+                    resolve(users);
+                })
+        })
+    })
+}
+```
+
+This function takes a username as an argument and sends it to the backend server through a GET Request to check the users table to know if the username exist or not with limited characters if it exists , it gives an order for taking a snapshot of the data and mapping (organising) it by its id next to it.
+
+Parameters:
+username (string): an username of an existing user in the database
+
+required: yes
+
+
+- sendNotification
+```
+export const sendNotification = (to, title, body, data) => dispatch => {
+    if (to == null) {
+        return;
+    }
+
+    let response = fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            to,
+            sound: 'default',
+            title,
+            body,
+            data
+        })
+    })
+
+}
+```
+
+This function contains four parts (to , title , body , data ) if 'to' has a null value it stops and starts over and the response attaches to the resource URL by a post method that sends data to the server to create / update the resource and stores the data in the request body of the HTTP request .
+
+
+- fetchUsersFollowingPosts
+```
+export function fetchUsersFollowingPosts(uid){
+
+    return ((dispatch,getState)=>{
+        firebase.firestore()
+        .collection("posts")
+        .doc(uid)
+        .collection("event")
+        .orderBy("creation","asc")
+        .get()
+        .then ((snapshot)=>{
+            const uid = snapshot.docs[0].ref.path.split('/')[1];
+            const user = getState().usersState.users.find(el => el.uid === uid);
+            let posts =snapshot.docs.map(doc =>{
+                const data = doc.data();
+                const id=doc.id;
+                return {id,...data,user}
+            })
+            dispatch({type:USERS_POSTS_STATE_CHANGE,posts,uid})
+            
+        })
+    })
+}
+```
+
+This function takes the current user id as an argument and sends it to the backend server through a GET Request to check the posts table then the events table and sends back the user's events as a response in ascending order for creation time and takes a snapshot of the data and stores it as each id is next to its username and its data in the variable USERS_POSTS_STATE_CHANGE.
