@@ -577,19 +577,19 @@ This function takes the current user id as an argument and sends it to the backe
 
  - We used some constants to store data in our database :
   
-      a. Constant for creating Event title 
+      1. Constant for creating Event title 
 
-      b. Constant for creating Brief Summary for Event
+      2. Constant for creating Brief Summary for Event
 
-      c. Constant for setting start date and end date for the Event
+      3. Constant for setting start date and end date for the Event
 
-      d. Constant for selecting number of participants in the Event
+      4. Constant for selecting number of participants in the Event
 
-      e. Constant for uploading Image about Event
+      5. Constant for uploading Image about Event
 
-      f. Constant for Event Progress
+      6. Constant for Event Progress
 
-      g. Constant for task completion
+      7. Constant for task completion
       
 ```
 
@@ -629,13 +629,13 @@ This function takes the current user id as an argument and sends it to the backe
 
   - We used some constants to store data in our database :
   
-    a. Constant for creating Activity name
+    1. Constant for creating Activity name
     
-    b. Constant for setting start date and end date for the Activity
+    2. Constant for setting start date and end date for the Activity
     
-    c. Constant for setting Activity location
+    3. Constant for setting Activity location
     
-    d. Constant for setting Activity Details
+    4. Constant for setting Activity Details
     
 ```
 const [activityName, setActivityName] = useState('')
