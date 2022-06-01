@@ -1,6 +1,6 @@
 # Code Documentation
-## Chapter 1   
-### Installation
+# Chapter 1   
+## Installation
 - 	Redux: 
     - Is a predictable state container for JavaScript apps.it helps you write applications that behave consistently, run in different                                           environments(client, server and native    ). On top of that , it provides a great developer experience , such as live code editing                                       combined with a time traveling debugger.  
     
@@ -81,12 +81,12 @@
         npm install react-native-image-picker
        ```
 
-## Chapter 2
-### Redux APIs
+# Chapter 2
+## Redux APIs
 The Redux API surface is tiny. Redux defines a set of contracts for you to implement (such as reducers) and provides a few helper functions to tie these contracts together.
 This section documents the complete Redux API. Keep in mind that Redux is only concerned with managing the state. In a real app, you'll also want to use UI bindings like react-redux.
 
-### Importing
+## Importing
 ```
 import firebase from 'firebase/compat/app';
 ```
@@ -103,7 +103,7 @@ import 'firebase/compat/firestore';
 import 'firebase/compat/storage';
 ```
 
-### Functions
+## Functions
 - fetchUser
 ```
     export function fetchUser() {
@@ -425,11 +425,10 @@ This function takes the current user id as an argument and sends it to the backe
 
 
 
-## Chapter 3
-### Screens
+# Chapter 3
+## Screens
 
    ### 3.1. Login 
-
 
    - This page has styling that distinguish login page.
    - We used some constants to store data in our database.
@@ -451,10 +450,12 @@ This function takes the current user id as an argument and sends it to the backe
             firebase.auth().signInWithEmailAndPassword(email, password)
           }
    ```   
-   .......................................................................................................................................................................
+   
+   
    
 
    ### 3.2. Home
+   
    - We function (home) to coordinate styling and features of image.
    
       
@@ -494,9 +495,11 @@ This function takes the current user id as an argument and sends it to the backe
           // usersLoaded:store.usersState.usersLoaded,
           }
 ```      
-.......................................................................................................................................................................
+
+
 
 ### 3.3.  Profile
+
   - We used some constants to store data in our database.
  
        1. Constant for setting users.
@@ -567,10 +570,100 @@ This function takes the current user id as an argument and sends it to the backe
                 }, [props.route.params ? props.route.params.item.id : currentUser.uid, props.following])
      
 ```
-.......................................................................................................................................................................
+
+
 
 ### 3.4. Create Event
 
+ - We used some constants to store data in our database :
+  
+      a. Constant for creating Event title 
+
+      b. Constant for creating Brief Summary for Event
+
+      c. Constant for setting start date and end date for the Event
+
+      d. Constant for selecting number of participants in the Event
+
+      e. Constant for uploading Image about Event
+
+      f. Constant for Event Progress
+
+      g. Constant for task completion
+      
+```
+
+   const [eventTitle, setEventTitle] = useState('');
+  const [briefSummary, setBriefSummary] = useState('');
+  const [date, setDate] = useState('');
+  const [noParticipants, setNoParticipents] = useState(''); 
+  const uploadImage =async()=>{
+    const storage = firebase.storage();
+    const childPath=`post/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`;
+    const uri =props.route.params.image;
+    const response =await fetch(uri);
+    const blob = await response.blob();
+        const task =firebase
+        .storage()
+        .ref()
+        .child(childPath)
+        .put(blob)
+    const taskProgress = snapshot =>{
+    console.log(`transferred: ${snapshot.bytesTransferred}`)
+    }
+    const taskCompleted = (snapshot)=>{
+        task.snapshot.ref.getDownloadURL().then((snapshot)=>{
+            savePostData(snapshot);
+            savePostHomeData(snapshot)
+            console.log(snapshot)
+        })
+    }
+    const taskError =snapshot =>{
+        console.log(snapshot)
+    }
+```
+
+
+### 3.5. Create Activity
+
+
+  - We used some constants to store data in our database :
+  
+    a. Constant for creating Activity name
+    
+    b. Constant for setting start date and end date for the Activity
+    
+    c. Constant for setting Activity location
+    
+    d. Constant for setting Activity Details
+    
+```
+const [activityName, setActivityName] = useState('')
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [location, setLocation] = useState('');
+    const [details, setDetails] = useState('');
+    const savePostData=()=>{
+      firebase.firestore().collection("posts")
+      .doc(firebase.auth().currentUser.uid)
+      .collection("event")
+      .doc(props.route.params.id)
+      .collection("Activities")
+```
+
+
+### 3.6. Choose Goals
+
+- We used a constant to select specific goals in checkbox.
+
+```
+const checkboxes = [
+  { id: 1, text: "Checkbox 1" },
+  { id: 2, text: "Checkbox 2" },
+  { id: 3, text: "Checkbox 3" }
+]
+```
+ 
 
 
        
