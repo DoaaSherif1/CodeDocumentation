@@ -362,7 +362,7 @@ export function queryUsersByUsername(username) {
 This function takes a username as an argument and sends it to the backend server through a GET Request to check the users table to know if the username exist or not with limited characters if it exists , it gives an order for taking a snapshot of the data and mapping (organising) it by its id next to it.
 
 Parameters:
-username (string): an username of an existing user in the database
+username (string): a username of an existing user in the database
 
 required: yes
 
